@@ -102,7 +102,7 @@ class Scanner {
                     while (!isAtEnd() && peek() != '\n') advance();
                 } else if (match('*')) {
                     while (!isAtEnd()) {
-                        if (peek() != '*' && peekNext() == '\\') {
+                        if (peek() == '*' && peekNext() == '/') {
                             advance();
                             advance();
                             break;
@@ -169,7 +169,7 @@ class Scanner {
     }
 
     private char peekNext() {
-        if (isAtEnd()) return '\0';
+        if (current + 1 >= source.length()) return '\0';
         return source.charAt(current + 1);
     }
 
