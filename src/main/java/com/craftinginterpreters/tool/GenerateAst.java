@@ -25,11 +25,19 @@ public class GenerateAst {
         writer.println();
         writer.println("abstract class " + baseName + " {");
         writer.println();
+
+        defineVisitor(writer, baseName, types);
+
         for (String type : types) {
             String className = type.split(":")[0].trim();
             String fields = type.split(":")[1].trim();
             defineType(writer, baseName, className, fields);
         }
+
+        // Base accept() method for the abstract class
+        writer.println();
+        writer.println("\tabstract <R> R accept(Visitor<R> visitor);");
+
         writer.println("}");
         writer.close();
     }
@@ -53,6 +61,24 @@ public class GenerateAst {
             writer.println("\t\tfinal " + field + ";");
         }
 
+        // The accept method from the Visitor Pattern
+        writer.println();
+        writer.println("\t\t@Override");
+        writer.println("\t\t<R> R accept(Visitor<R> visitor) {");
+        writer.println();
+        writer.println("\t\t\treturn visitor.visit" + className + baseName + "(this);");
+        writer.println("\t\t}");
+
+        writer.println("\t}");
+    }
+
+    private static void defineVisitor(PrintWriter writer, String baseName, List<String> types) throws IOException {
+        writer.println("\tinterface Visitor<R> {");
+        writer.println();
+        for (String type : types) {
+            String className = type.split(":")[0].trim();
+            writer.println("\t\tR visit" + className + baseName + "(" + className + " " + baseName.toLowerCase() + ");");
+        }
         writer.println("\t}");
     }
 
