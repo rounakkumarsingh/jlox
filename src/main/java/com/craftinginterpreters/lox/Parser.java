@@ -23,7 +23,30 @@ public class Parser {
     }
 
     private Expr expression() {
-        return equality();
+        return comma();
+    }
+
+    private Expr comma() {
+        Expr expr = ternary();
+
+        while (match(COMMA)) {
+            Token operator = previous();
+            Expr next = ternary();
+            expr = new Expr.Binary(expr, operator, next);
+        }
+        return expr;
+    }
+
+    private Expr ternary() {
+        Expr expr = equality();
+
+        if (match(QUESTION_MARK)) {
+            Expr thenCondition = expression();
+            consume(COLON, "Expected colon in ternary operator");
+            Expr elseCondition = ternary(); // right associative, we use recursion bitches
+            expr = new Expr.Ternary(expr, thenCondition, elseCondition);
+        }
+        return expr;
     }
 
     private Expr equality() {

@@ -32,32 +32,35 @@ class AstPrinter implements Expr.Visitor<String> {
     private String parenthesize(String name, Expr... exprs) {
         StringBuilder builder = new StringBuilder();
 
-        builder.append("(");
+        builder.append("(").append(name);
         for (Expr expr : exprs) {
             builder.append(expr.accept(this));
             builder.append(" ");
         }
-        builder.append(") ");
+        builder.append(")");
 
-        return builder.append(name).toString();
+        return builder.toString();
+    }
+
+    public String visitTernaryExpr(Expr.Ternary expr) {
+        return parenthesize("?:", expr.condition, expr.thenBranch, expr.elseBranch);
     }
 
     public static void main(String[] args) {
-        Expr expression = new Expr.Binary(
-                new Expr.Grouping(
-                        new Expr.Binary(
-                                new Expr.Literal(1),
-                                new Token(TokenType.PLUS, "+", null, 1),
-                                new Expr.Literal(2)
-                        )
+        Expr expression = new Expr.Ternary(
+                new Expr.Binary(
+                        new Expr.Literal(1),
+                        new Token(TokenType.GREATER_EQUAL, ">=", null, 1),
+                        new Expr.Literal(2)),
+                new Expr.Binary(
+                        new Expr.Literal(3),
+                        new Token(TokenType.PLUS, "+", null, 1),
+                        new Expr.Literal(4)
                 ),
-                new Token(TokenType.STAR, "*", null, 1),
-                new Expr.Grouping(
-                        new Expr.Binary(
-                                new Expr.Literal(3),
-                                new Token(TokenType.PLUS, "+", null, 1),
-                                new Expr.Literal(4)
-                        )
+                new Expr.Binary(
+                        new Expr.Literal(6),
+                        new Token(TokenType.PLUS, "+", null, 1),
+                        new Expr.Literal(5)
                 )
         );
         System.out.println(new AstPrinter().print(expression));
