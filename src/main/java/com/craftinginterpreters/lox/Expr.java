@@ -4,9 +4,9 @@
 
 package com.craftinginterpreters.lox;
 
-abstract class Expr {
+public abstract class Expr {
 
-	interface Visitor<R> {
+	public interface Visitor<R> {
 
 		R visitBinaryExpr(Binary expr);
 		R visitGroupingExpr(Grouping expr);
@@ -14,7 +14,7 @@ abstract class Expr {
 		R visitUnaryExpr(Unary expr);
 		R visitTernaryExpr(Ternary expr);
 	}
-	static class Binary extends Expr {
+	public static class Binary extends Expr {
 
 		Binary(Expr left, Token operator, Expr right) {
 
@@ -33,7 +33,7 @@ abstract class Expr {
 			return visitor.visitBinaryExpr(this);
 		}
 	}
-	static class Grouping extends Expr {
+	public static class Grouping extends Expr {
 
 		Grouping(Expr expression) {
 
@@ -48,7 +48,7 @@ abstract class Expr {
 			return visitor.visitGroupingExpr(this);
 		}
 	}
-	static class Literal extends Expr {
+	public static class Literal extends Expr {
 
 		Literal(Object value) {
 
@@ -63,7 +63,7 @@ abstract class Expr {
 			return visitor.visitLiteralExpr(this);
 		}
 	}
-	static class Unary extends Expr {
+	public static class Unary extends Expr {
 
 		Unary(Token operator, Expr right) {
 
@@ -80,7 +80,7 @@ abstract class Expr {
 			return visitor.visitUnaryExpr(this);
 		}
 	}
-	static class Ternary extends Expr {
+	public static class Ternary extends Expr {
 
 		Ternary(Expr condition, Expr thenBranch, Expr elseBranch) {
 

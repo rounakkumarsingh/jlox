@@ -23,7 +23,7 @@ public class GenerateAst {
         writer.println();
         writer.println("package com.craftinginterpreters.lox;");
         writer.println();
-        writer.println("abstract class " + baseName + " {");
+        writer.println("public abstract class " + baseName + " {");
         writer.println();
 
         defineVisitor(writer, baseName, types);
@@ -43,7 +43,7 @@ public class GenerateAst {
     }
 
     private static void defineType(PrintWriter writer, String baseName, String className,String fieldList) throws IOException {
-        writer.println("\tstatic class " + className + " extends " + baseName + " {");
+        writer.println("\tpublic static class " + className + " extends " + baseName + " {");
 
         //Constructor
         writer.println();
@@ -73,7 +73,7 @@ public class GenerateAst {
     }
 
     private static void defineVisitor(PrintWriter writer, String baseName, List<String> types) throws IOException {
-        writer.println("\tinterface Visitor<R> {");
+        writer.println("\tpublic interface Visitor<R> {");
         writer.println();
         for (String type : types) {
             String className = type.split(":")[0].trim();
