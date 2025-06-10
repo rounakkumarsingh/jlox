@@ -2,7 +2,7 @@
 
 package com.craftinginterpreters.lox;
 
-class AstPrinter implements Expr.Visitor<String> {
+abstract class AstPrinter implements Expr.Visitor<String> {
     String print(Expr expr) {
         return expr.accept(this);
     }
@@ -63,7 +63,7 @@ class AstPrinter implements Expr.Visitor<String> {
                         new Expr.Literal(5)
                 )
         );
-        System.out.println(new AstPrinter().print(expression));
+//        System.out.println(new AstPrinter().print(expression));
     }
 
 }
