@@ -1,6 +1,7 @@
 package com.craftinginterpreters.lox;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static com.craftinginterpreters.lox.TokenType.*;
@@ -46,7 +47,71 @@ public class Parser {
     private Stmt statement() {
         if (match(PRINT)) return printStatement();
         else if (match(LEFT_BRACE)) return new Stmt.Block(block());
+        else if (match(IF)) return ifStatement();
+        else if (match(WHILE)) return whileStatement();
+        else if (match(FOR)) return forStatement();
         else return expressionStatement();
+    }
+
+    private Stmt forStatement() {
+        consume(LEFT_PAREN, "Expect '(' after 'for'.");
+
+        Stmt initializer;
+        if (match(SEMICOLON)) {
+            initializer = null;
+        } else if (match(VAR)) {
+            initializer = varDeclaration();
+        } else {
+            initializer = expressionStatement();
+        }
+
+        Expr condition = null;
+        if (!check(SEMICOLON)) condition = expression();
+        consume(SEMICOLON, "Expect ';' after loop condition.");
+
+        Expr increment = null;
+        if (!check(SEMICOLON)) increment = expression();
+        consume(RIGHT_PAREN, "Expect ')' after for clauses.");
+
+        Stmt body = statement();
+
+        if (increment != null) {
+            body = new Stmt.Block(Arrays.asList(
+                    body,
+                    new Stmt.Expression(increment)
+            ));
+        }
+
+        if (condition == null) condition = new Expr.Literal(true);
+        body = new Stmt.While(condition, body);
+
+        if (initializer != null) body = new Stmt.Block(Arrays.asList(initializer, body));
+
+        return body;
+    }
+
+    private Stmt whileStatement() {
+        consume(LEFT_PAREN, "Expect '(' after 'if'.");
+        Expr condition = expression();
+        consume(RIGHT_PAREN, "Expect ')' after if condition.");
+
+        Stmt body = statement();
+
+        return new Stmt.While(condition, body);
+
+    }
+
+    private Stmt ifStatement() {
+        consume(LEFT_PAREN, "Expect '(' after 'if'.");
+        Expr condition = expression();
+        consume(RIGHT_PAREN, "Expect ')' after if condition.");
+
+        Stmt thenBranch = statement();
+
+        Stmt elseBranch = null;
+        if (match(ELSE)) elseBranch = statement();
+
+        return new Stmt.If(condition, thenBranch, elseBranch);
     }
 
     private List<Stmt> block() {
@@ -88,7 +153,7 @@ public class Parser {
     }
 
     private Expr assignment() {
-        Expr expr = ternary();
+        Expr expr = or();
         
         if (match(EQUAL)) {
             Token equals = previous();
@@ -104,13 +169,37 @@ public class Parser {
         return expr;
     }
 
+    private Expr or() {
+        Expr expr = and();
+
+        while (match(OR)) {
+            Token operator = previous();
+            Expr right = and();
+            expr = new Expr.Logical(expr, operator, right);
+        }
+
+        return expr;
+    }
+
+    private Expr and() {
+        Expr expr = ternary();
+
+        while (match(AND)) {
+            Token operator = previous();
+            Expr right = ternary();
+            expr = new Expr.Logical(expr, operator, right);
+        }
+
+        return expr;
+    }
+
     private Expr ternary() {
         Expr expr = equality();
 
         if (match(QUESTION_MARK)) {
             Expr thenCondition = expression();
             consume(COLON, "Expected colon in ternary operator");
-            Expr elseCondition = ternary(); // right associative, we use recursion bitches
+            Expr elseCondition = ternary();
             expr = new Expr.Ternary(expr, thenCondition, elseCondition);
         }
         return expr;
