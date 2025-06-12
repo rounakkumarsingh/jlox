@@ -17,6 +17,7 @@ public abstract class Expr {
 		R visitVariableExpr(Variable expr);
 		R visitAssignExpr(Assign expr);
 		R visitLogicalExpr(Logical expr);
+		R visitCallExpr(Call expr);
 	}
 
 	public static class Ternary extends Expr {
@@ -136,6 +137,23 @@ public abstract class Expr {
 		@Override
 		<R> R accept(Visitor<R> visitor) {
 			return visitor.visitLogicalExpr(this);
+		}
+	}
+
+	public static class Call extends Expr {
+		Call(Expr callee, Token paren, List<Expr> arguments) {
+			this.callee = callee;
+			this.paren = paren;
+			this.arguments = arguments;
+		}
+
+		final Expr callee;
+		final Token paren;
+		final List<Expr> arguments;
+
+		@Override
+		<R> R accept(Visitor<R> visitor) {
+			return visitor.visitCallExpr(this);
 		}
 	}
 

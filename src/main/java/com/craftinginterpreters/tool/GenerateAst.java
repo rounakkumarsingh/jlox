@@ -44,7 +44,7 @@ public class GenerateAst {
         writer.close();
     }
 
-    private static void defineType(PrintWriter writer, String baseName, String className,String fieldList) throws IOException {
+    private static void defineType(PrintWriter writer, String baseName, String className,String fieldList) {
         writer.println("\tpublic static class " + className + " extends " + baseName + " {");
 
         //Constructor
@@ -72,7 +72,7 @@ public class GenerateAst {
         writer.println();
     }
 
-    private static void defineVisitor(PrintWriter writer, String baseName, List<String> types) throws IOException {
+    private static void defineVisitor(PrintWriter writer, String baseName, List<String> types) {
         writer.println("\tpublic interface Visitor<R> {");
         for (String type : types) {
             String className = type.split(":")[0].trim();
@@ -95,8 +95,9 @@ public class GenerateAst {
                 "Literal  : Object value",
                 "Unary    : Token operator, Expr right",
                 "Variable : Token name",
-                "Assign   : Token name, Expr valule",
-                "Logical  : Expr left, Token operator, Expr right"
+                "Assign   : Token name, Expr value",
+                "Logical  : Expr left, Token operator, Expr right",
+                "Call     : Expr callee, Token paren, List<Expr> arguments"
 
         ));
 
@@ -106,7 +107,9 @@ public class GenerateAst {
                 "Print      : Expr Expression",
                 "Var        : Token name, Expr initializer",
                 "If         : Expr condition, Stmt thenBranch, Stmt elseBranch",
-                "While      : Expr condition, Stmt body"
+                "While      : Expr condition, Stmt body",
+                "Function   : Token name, List<Token> params, List<Stmt> body",
+                "Return     : Token keyword, Expr value"
         ));
     }
 }
